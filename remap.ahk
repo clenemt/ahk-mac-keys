@@ -119,7 +119,12 @@ global start_dir := "C:\Users\cleme"
 #+m::Send ^+m
 #n::Send ^n
 #!n::Send ^!n
-#+n::Send ^+n
+#+n::
+  if WinActive("ahk_exe firefox.exe")
+    Send ^+p ; Show dev tools on browsers
+  else
+    Send ^+n
+  return
 #o::Send ^o
 #+o::Send ^+o
 #p::Send ^p
@@ -213,9 +218,9 @@ global start_dir := "C:\Users\cleme"
 LWin & Tab::
   AltTabMenu := true
   if GetKeyState("Shift","P")
-    Send {Alt Down}{Shift Down}{Tab}
+    SendEvent {Alt Down}{Shift Down}{Tab}
   else
-    Send {Alt Down}{Tab}
+    SendEvent {Alt Down}{Tab}
   return
 #if (AltTabMenu)
   ~*#q::Send {Del}
@@ -232,7 +237,7 @@ LWin & Tab::
 #if
 
 ; Windows Terminal quake like for now
-#`::
+#SC029::
   terminal := WinExist("ahk_exe WindowsTerminal.exe")
     if terminal {
       active := WinActive("ahk_id " terminal)
