@@ -171,12 +171,12 @@ global start_dir := "C:\Users\cleme"
 #Delete::Send ^{Delete}
 #Enter::
   if WinActive("ahk_exe explorer.exe")
-    Send {F2} ; Rename file ine explorer
+    Send {F2} ; Rename file in explorer
   else
     Send ^{Enter}
   return
 
-#F1::Send #x ; Show same menu as right clicking windows logo in task bar
+#F1::Send #x ; Shows same menu as right clicking windows logo in task bar
 #F2::Send #r ; Shows windows run since we remmaped it
 #F3::Send #d ; Shows desktop
 #F7::Send {Media_Prev}
