@@ -85,14 +85,14 @@ global start_dir := "C:\Users\cleme"
 #+c::Send ^+c
 #!c::
   if WinActive("ahk_group Browsers")
-    Send ^+c ; Show inspector mode inside dev tools on browsers
+    Send ^+c ; Shows inspector mode inside dev tools on browsers
   else
     Send ^!c
   return
 #d::Send ^d
 #!d::Send ^!d
 #+d::Send ^+d
-#e::Run explorer.exe %start_dir% ; Allow custom startup folder otherwise impossible
+#e::Run %start_dir% ; Allow custom startup folder otherwise impossible
 #+e::Send ^+e
 #f::Send ^f
 #+f::Send ^+f
@@ -101,13 +101,13 @@ global start_dir := "C:\Users\cleme"
 #h::Send ^h
 #i::
   if WinActive("ahk_exe explorer.exe")
-    Send !{Enter} ; Show info panel in explorer
+    Send !{Enter} ; Shows info panel in explorer
   else
     Send ^i
   return
 #!i::
   if WinActive("ahk_group Browsers")
-    Send ^+i ; Show dev tools on browsers
+    Send ^+i ; Shows dev tools on browsers
   else
     Send ^!i
   return
@@ -121,7 +121,7 @@ global start_dir := "C:\Users\cleme"
 #!n::Send ^!n
 #+n::
   if WinActive("ahk_exe firefox.exe")
-    Send ^+p ; Show dev tools on browsers
+    Send ^+p ; Shows dev tools on browsers
   else
     Send ^+n
   return
