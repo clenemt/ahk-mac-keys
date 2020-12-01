@@ -13,6 +13,7 @@ RegWrite, REG_DWORD, HKEY_CURRENT_USER, Software\Microsoft\Windows\CurrentVersio
 GroupAdd, Browsers, ahk_exe chrome.exe
 GroupAdd, Browsers, ahk_exe firefox.exe
 GroupAdd, Editors, ahk_exe Code.exe
+GroupAdd, Terminals, ahk_exe WindowsTerminal.exe
 
 global start_dir := "C:\Users\cleme"
 
@@ -48,16 +49,14 @@ global start_dir := "C:\Users\cleme"
 !+Right::Send ^+{Right}
 
 ; Delete
-!BS::Send {LShift Down}{LCtrl Down}{Left}{LShift Up}{LCtrl Up}{Del}
-!+BS::Send {LShift Down}{LCtrl Down}{Right}{LShift Up}{LCtrl Up}{Del}
-#+BS::Send {LShift down}{End}{LShift Up}{Del}
+!BS::Send {LShift Down}{LCtrl Down}{Left}{LShift Up}{LCtrl Up}{Delete}
+!+BS::Send {LShift Down}{LCtrl Down}{Right}{LShift Up}{LCtrl Up}{Delete}
+#+BS::Send {LShift down}{End}{LShift Up}{Delete}
 #BS::
-  if WinActive("ahk_group Editors")
-    Send ^+{BS}
-  else if WinActive("ahk_exe explorer.exe")
+  if WinActive("ahk_exe explorer.exe")
     Send {Delete} ; Put selected file in bin in explorer
   else
-    Send {LShift Down}{Home}{LShift Up}{Del}
+    Send {LShift Down}{Home}{LShift Up}{Delete}
   return
 
 ; Select multiple caret
@@ -92,10 +91,20 @@ global start_dir := "C:\Users\cleme"
 #d::Send ^d
 #!d::Send ^!d
 #+d::Send ^+d
-#e::Run %start_dir% ; Allow custom startup folder otherwise impossible
-#+e::Send ^+e
+#e::Run, %start_dir% ; Allow custom startup folder otherwise impossible
+#+e::
+  if WinActive("ahk_exe Simplenote.exe")
+    Send ^+f ; Show sidebar in simplenote
+  else
+    Send ^+e
+  return
 #f::Send ^f
-#+f::Send ^+f
+#+f::
+  if WinActive("ahk_exe Simplenote.exe")
+    Send ^+s ; Focus search field in simplenote
+  else
+    Send ^+f
+  return
 #!f::Send +!f
 #g::Send ^g
 #h::Send ^h
@@ -113,6 +122,7 @@ global start_dir := "C:\Users\cleme"
   return
 #+i::Send ^+i
 #k::Send ^k
+#+k::Send ^+k
 #l::Send ^l
 #+l::Send ^+l
 #m::WinMinimize, a ; Minimize current app
@@ -130,14 +140,19 @@ global start_dir := "C:\Users\cleme"
 #p::Send ^p
 #+p::Send ^+p
 #!p::Send ^!p
-#if not (AltTabMenu)
-  #q::Send !{F4} ; Force quit app
+#if not (AltTabMenu) ; We want to be able to quit with #q in alt tab mode
+  #q::Send !{F4}     ; Force quit app
 #if
 #r::Send ^r
 #+r::Send ^+r
 #s::Send ^s
 #+s::Send ^+s
-#t::Send ^t
+#t::
+  if WinActive("ahk_exe Simplenote.exe")
+    Send ^+i ; New note in simplenote
+  else
+    Send ^t
+  return
 #+t::Send ^+t
 #u::Send ^u
 #v::Send ^v
@@ -192,6 +207,7 @@ global start_dir := "C:\Users\cleme"
 #F12::Send {Volume_Up 2}
 #F13::Send {PrintScreen}
 
+
 ; ------
 ; ACCENTED CHARACTERS
 ; ------
@@ -209,6 +225,7 @@ global start_dir := "C:\Users\cleme"
 !+i:: Send {Asc 139}
 !o:: Send {Asc 147}
 
+
 ; ------
 ; APPS
 ; ------
@@ -223,14 +240,14 @@ LWin & Tab::
     SendEvent {Alt Down}{Tab}
   return
 #if (AltTabMenu)
-  ~*#q::Send {Del}
+  ~*#q::Send {Delete}
   ~*LWin Up::
     Send {Shift Up}{Alt Up}
     AltTabMenu := false
     return
 #if
 
-; History remap since alt -> left is move by word
+; Browsers history remap since alt -> left is move by word
 #if WinActive("ahk_group Browsers")
   ^Left::Send !{Left}
   ^Right::Send !{Right}
@@ -239,16 +256,18 @@ LWin & Tab::
 ; Windows Terminal quake like for now
 #SC029::
   terminal := WinExist("ahk_exe WindowsTerminal.exe")
-    if terminal {
-      active := WinActive("ahk_id " terminal)
-      if (active)
-        WinMinimize, ahk_id %active%
-      else
-        WinActivate, ahk_id %terminal%
-    } else {
-      Run, wt.exe
-    }
-  Return
+  if terminal {
+    active := WinActive("ahk_id " terminal)
+    if (active)
+      WinMinimize, ahk_id %active%
+    else
+      WinActivate, ahk_id %terminal%
+  } else {
+    ; see https://www.autohotkey.com/boards/viewtopic.php?t=4392&p=24540
+    sleep, 150
+    Run, wt.exe
+  }
+  return
 
 ; Lock computer
 F19::
@@ -256,3 +275,15 @@ F19::
   DllCall("LockWorkStation")
   Reload
   return
+
+; Show / Hide hidden files
+#if WinActive("ahk_exe explorer.exe")
+  #+.::
+    RegRead, ShowHidden_Status, HKEY_CURRENT_USER, Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced, Hidden
+    if ShowHidden_Status = 2
+      RegWrite, REG_DWORD, HKEY_CURRENT_USER, Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced, Hidden, 1
+    else
+      RegWrite, REG_DWORD, HKEY_CURRENT_USER, Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced, Hidden, 2
+      Send, {F5}
+    return
+#if
