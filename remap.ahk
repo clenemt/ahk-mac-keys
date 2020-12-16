@@ -55,6 +55,8 @@ global start_dir := "C:\Users\cleme"
 #BS::
   if WinActive("ahk_exe explorer.exe")
     Send {Delete} ; Put selected file in bin in explorer
+  else if WinActive("ahk_group Editors")
+    Send {LShift Down}{Home}{BackSpace}{LShift Up}
   else
     Send {LShift Down}{Home}{LShift Up}{Delete}
   return
@@ -84,12 +86,17 @@ global start_dir := "C:\Users\cleme"
 #+c::Send ^+c
 #!c::
   if WinActive("ahk_group Browsers")
-    Send ^+c ; Shows inspector mode inside dev tools on browsers
+    Send ^+c ; Shows inspector mode for dev tools on browsers
   else
     Send ^!c
   return
 #d::Send ^d
-#!d::Send ^!d
+#!d::
+  if WinActive("ahk_group Browsers")
+    Send ^+d ; Change docking mode for dev tools on browsers
+  else
+    Send ^!d
+  return
 #+d::Send ^+d
 #e::Run, %start_dir% ; Allow custom startup folder otherwise impossible
 #+e::
@@ -97,6 +104,12 @@ global start_dir := "C:\Users\cleme"
     Send ^+f ; Show sidebar in simplenote
   else
     Send ^+e
+  return
+#!e::
+  if WinActive("ahk_group Browsers")
+    Send ^+e ; Shows network mode for dev tools on browsers
+  else
+    Send ^!e
   return
 #f::Send ^f
 #+f::
@@ -123,15 +136,27 @@ global start_dir := "C:\Users\cleme"
 #+i::Send ^+i
 #k::Send ^k
 #+k::Send ^+k
+#!k::
+  if WinActive("ahk_group Browsers")
+    Send ^+k ; Shows console mode for dev tools on browsers
+  else
+    Send ^!k
+  return
 #l::Send ^l
 #+l::Send ^+l
 #m::WinMinimize, a ; Minimize current app
 #+m::Send ^+m
+#!m::
+  if WinActive("ahk_group Browsers")
+    Send ^+m ; Shows mobile dev tools on browsers
+  else
+    Send ^!m
+  return
 #n::Send ^n
 #!n::Send ^!n
 #+n::
   if WinActive("ahk_exe firefox.exe")
-    Send ^+p ; Shows dev tools on browsers
+    Send ^+p ; Create new private window similar to chrome
   else
     Send ^+n
   return
